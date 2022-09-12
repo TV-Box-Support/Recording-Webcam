@@ -3,11 +3,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:http/http.dart' as http;
 
 class VideoPage extends StatefulWidget {
   final String filePath;
+  final File file;
 
-  const VideoPage({Key? key, required this.filePath}) : super(key: key);
+  const VideoPage({Key? key, required this.filePath, required this.file})
+      : super(key: key);
 
   @override
   _VideoPageState createState() => _VideoPageState();
@@ -23,7 +26,6 @@ class _VideoPageState extends State<VideoPage> {
     _videoPlayerController = VideoPlayerController.file(File(widget.filePath));
     _initVideoPlayer = _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
-    _videoPlayerController.play();
   }
 
   @override
@@ -32,12 +34,6 @@ class _VideoPageState extends State<VideoPage> {
     super.dispose();
   }
 
-  // Future _initVideoPlayer() async {
-  //   _videoPlayerController = VideoPlayerController.file(File(widget.filePath));
-  //   await _videoPlayerController.initialize();
-  //   await _videoPlayerController.setLooping(true);
-  //   await _videoPlayerController.play();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -67,27 +63,45 @@ class _VideoPageState extends State<VideoPage> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Wrap the play or pause in a call to `setState`. This ensures the
-          // correct icon is shown.
-          setState(() {
-            // If the video is playing, pause it.
-            if (_videoPlayerController.value.isPlaying) {
-              _videoPlayerController.pause();
-            } else {
-              // If the video is paused, play it.
-              _videoPlayerController.play();
-            }
-          });
-        },
-        // Display the correct icon depending on the state of the player.
-        child: Icon(
-          _videoPlayerController.value.isPlaying
-              ? Icons.pause
-              : Icons.play_arrow,
-        ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              // Wrap the play or pause in a call to `setState`. This ensures the
+              // correct icon is shown.
+              setState(() {
+                // If the video is playing, pause it.
+                if (_videoPlayerController.value.isPlaying) {
+                  _videoPlayerController.pause();
+                } else {
+                  // If the video is paused, play it.
+                  _videoPlayerController.play();
+                }
+              });
+            },
+            // Display the correct icon depending on the state of the player.
+            child: Icon(
+              _videoPlayerController.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
+            ),
+          ),
+          FloatingActionButton(onPressed: () => _uploadFile(widget.file))
+        ],
       ),
     );
+  }
+
+  void _uploadFile(File file) async {
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('http://192.168.1.61:5000/uploadFile'));
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+    var response = await request.send();
+    if(response.statusCode == 200 ){
+      print('ok');
+    }else{
+      print('no');
+    };
   }
 }
