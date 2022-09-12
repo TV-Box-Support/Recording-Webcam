@@ -34,18 +34,19 @@ class _CameraPageState extends State<CameraPage> {
         }
       },
       onVideoRecorded: (value) {
+        File file = File(value.path);
         final path = value.path;
         if (path.contains('.mp4')) {
           final route = MaterialPageRoute(
             fullscreenDialog: false,
-            builder: (_) => VideoPage(filePath: path),
+            builder: (_) => VideoPage(filePath: path, file: file),
           );
           Navigator.push(context, route);
         }
-
         ///Show video preview .mp4
       },
     );
     // return Container();
   }
 }
+
