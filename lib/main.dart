@@ -1,13 +1,19 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'camera_page.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
@@ -28,12 +34,67 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
+  bool ActiveConnection = false;
+
+  Future CheckUserConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          ActiveConnection = true;
+          Fluttertoast.showToast(
+              msg: "wifi đã kết nối",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 2,
+              backgroundColor: Colors.white54,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        ActiveConnection = false;
+        Fluttertoast.showToast(
+            msg: "Hãy kết nối wifi để có thể upload lên server",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.white54,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    CheckUserConnection();
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) return;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Camera Flutter App',
           style: TextStyle(
             fontSize: 20,
@@ -43,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: const [
             Text(
               'Thực hành phát triển ứng dụng record Video từ Camera và Upload video lên Server',
               style: TextStyle(
@@ -63,20 +124,14 @@ class _MyHomePageState extends State<MyHomePage> {
         splashColor: Colors.purple,
         tooltip: 'Camera',
         label: Row(
-          children: [
+          children: const [
             Icon(Icons.not_started_outlined),
             Text('  Start'),
           ],
         ),
         onPressed: () {
-          var mySnackBar = SnackBar(
-            content: Text('wooooo'),
-            duration: Duration(seconds: 3),
-            backgroundColor: Colors.green,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(mySnackBar);
           Navigator.push(
-              context, CupertinoPageRoute(builder: (context) => CameraPage()));
+              context, MaterialPageRoute(builder: (context) => const CameraPage()));
         },
       ),
     );

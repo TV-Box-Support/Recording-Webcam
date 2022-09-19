@@ -1,3 +1,4 @@
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
@@ -93,17 +94,36 @@ class _CustomCameraState extends State<CustomCamera> {
       key: const ValueKey(0),
       children: [
         ///Camera preview
-        SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: CameraPreview(
-            controller!,
+        Positioned(
+          top: 90,
+          bottom: 90,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: CameraPreview(
+              controller!,
+            ),
           ),
         ),
 
-        ///Side controlls
+        //appbar
         Positioned(
-            top: 40,
+          top: 0,
+          height: 90,
+          width: MediaQuery.of(context).size.width,
+          child: Container(
+            alignment: Alignment.bottomCenter,
+            color: Colors.black,
+            child: const Text(
+              "Capturing...",
+              style: TextStyle(color: Colors.white, fontSize: 22),
+            ),
+          ),
+        ),
+
+        ///Side controls
+        Positioned(
+            top: 60,
             right: 20,
             child: Column(
               children: [
@@ -123,11 +143,13 @@ class _CustomCameraState extends State<CustomCamera> {
 
         ///Bottom Controls
         Positioned(
-          bottom: 20,
+          bottom: 0,
+          height: 90,
           child: Container(
+            color: Colors.black,
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.all(10),
+            // padding: const EdgeInsets.all(10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -141,22 +163,18 @@ class _CustomCameraState extends State<CustomCamera> {
                     size: 50,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
+                IconButton(
+                  onPressed: () {
                     setState(() {
                       _cameraView = false;
                     });
                   },
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(top: 20.0, left: 10, right: 10),
-                    child: Icon(
+                    icon: Icon(
                       Icons.videocam,
                       color: widget.iconColor,
                       size: 60,
                     ),
                   ),
-                )
               ],
             ),
           ),
@@ -173,21 +191,26 @@ class _CustomCameraState extends State<CustomCamera> {
     return Stack(
       key: const ValueKey(1),
       children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: CameraPreview(
-            controller!,
+        Positioned(
+          top: 90,
+          bottom: 90,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: CameraPreview(
+              controller!,
+            ),
           ),
         ),
 
-        ///Side controlls
+        ///top controlls
         Positioned(
             top: 0,
+            height: 90,
             child: Container(
+              color: Colors.black,
               padding: const EdgeInsets.only(top: 35),
               width: MediaQuery.of(context).size.width,
-              color: widget.iconColor,
               height: 90,
               child: Row(
                 children: [
@@ -197,10 +220,12 @@ class _CustomCameraState extends State<CustomCamera> {
                     child: Container(
                       alignment: Alignment.center,
                       child: Text(
-                        _isRecording == false
-                            ? 'Video'
-                            : 'Recording',
-                        style: TextStyle(color: widget.iconColor, fontSize: 22),
+                        _isRecording == false ? 'Video' : 'Recording',
+                        style: TextStyle(
+                            color: _isRecording == false
+                                ? widget.iconColor
+                                : Colors.red,
+                            fontSize: 22),
                       ),
                     ),
                   ),
@@ -213,8 +238,10 @@ class _CustomCameraState extends State<CustomCamera> {
 
         ///Bottom Controls
         Positioned(
-          bottom: 20,
+          bottom: 0,
+          height: 90,
           child: Container(
+            color: Colors.black,
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(20),
@@ -256,7 +283,9 @@ class _CustomCameraState extends State<CustomCamera> {
                     setState(() {});
                   },
                   icon: Icon(
-                    Icons.play_circle,
+                    _isRecording == false
+                        ? Icons.panorama_fish_eye
+                        : Icons.circle_rounded,
                     color: widget.iconColor,
                     size: 50,
                   ),
