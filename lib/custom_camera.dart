@@ -1,3 +1,4 @@
+import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -93,15 +94,18 @@ class _CustomCameraState extends State<CustomCamera> {
       // Stack là một bộ chứa cho phép đặt các widget con của nó chồng lên nhau
       key: const ValueKey(0),
       children: [
-        ///Camera preview
+        //Camera preview
         Positioned(
           top: 90,
           bottom: 90,
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            child: CameraPreview(
-              controller!,
+            child: RotatedBox(
+              quarterTurns: 1 - controller!.description.sensorOrientation ~/ 90,
+              child: CameraPreview(
+                controller!,
+              ),
             ),
           ),
         ),
@@ -169,12 +173,12 @@ class _CustomCameraState extends State<CustomCamera> {
                       _cameraView = false;
                     });
                   },
-                    icon: Icon(
-                      Icons.videocam,
-                      color: widget.iconColor,
-                      size: 60,
-                    ),
+                  icon: Icon(
+                    Icons.videocam,
+                    color: widget.iconColor,
+                    size: 60,
                   ),
+                ),
               ],
             ),
           ),
@@ -197,8 +201,11 @@ class _CustomCameraState extends State<CustomCamera> {
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            child: CameraPreview(
-              controller!,
+            child: RotatedBox(
+              quarterTurns: 1 - controller!.description.sensorOrientation ~/ 90,
+              child: CameraPreview(
+                controller!,
+              ),
             ),
           ),
         ),
@@ -344,12 +351,12 @@ class _CustomCameraState extends State<CustomCamera> {
   Widget cameraSwitcherWidget() {
     return IconButton(
       onPressed: () {
-        if (_isFrontCamera == false) {
-          setCamera(1);
-          _isFrontCamera = true;
-        } else {
+        if (_isFrontCamera == true) {
           setCamera(0);
           _isFrontCamera = false;
+        } else {
+          setCamera(1);
+          _isFrontCamera = true;
         }
         setState(() {});
       },

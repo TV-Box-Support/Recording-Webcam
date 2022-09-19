@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -27,39 +28,39 @@ class CameraPageState extends State<CameraPage> {
               context: context,
               builder: (context) {
                 return Scaffold(
-                  appBar: AppBar(
-                    title: const Text('Photo'),
-                    centerTitle: true,
-                    backgroundColor: Colors.black,
-                    actions: [
-                      IconButton(
-                          onPressed: () async {
-                            var request = await uploadFile(context, file).whenComplete((){
-                              Navigator.of(context).pop();
-                            });
-                            if(request){
-                              Fluttertoast.showToast(
-                                  msg: "Upload Success!!!!!",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 2,
-                                  backgroundColor: Colors.white54,
-                                  textColor: Colors.white,
-                                  fontSize: 20.0
-                              );
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.cloud_upload,
-                            color: Colors.white,
-                            size: 35,
-                          ))
-                    ],
-                  ),
-                  body: AlertDialog(
-                    content: Image.file(File(path)),
-                  ),
-                );
+                    appBar: AppBar(
+                      title: const Text('Photo'),
+                      centerTitle: true,
+                      backgroundColor: Colors.black,
+                      actions: [
+                        IconButton(
+                            onPressed: () async {
+                              var request = await uploadFile(context, file)
+                                  .whenComplete(() {});
+                              if (request) {
+                                Fluttertoast.showToast(
+                                    msg: "Upload Success!!!!!",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 2,
+                                    backgroundColor: Colors.white54,
+                                    textColor: Colors.white,
+                                    fontSize: 20.0);
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.cloud_upload,
+                              color: Colors.white,
+                              size: 35,
+                            ))
+                      ],
+                    ),
+                    body: Transform.rotate(
+                      angle: 90 * pi / 180,
+                      child: AlertDialog(
+                        content: Image.file(File(path)),
+                      ),
+                    ));
               });
         }
       },
@@ -73,10 +74,7 @@ class CameraPageState extends State<CameraPage> {
           );
           Navigator.push(context, route);
         }
-        ///Show video preview .mp4
       },
     );
-    // return Container();
   }
 }
-

@@ -49,20 +49,16 @@ class _VideoPageState extends State<VideoPage> {
           IconButton(
               onPressed: () async {
                 var request =
-                    await uploadFile(context, widget.file).whenComplete(() {
-                  Navigator.of(context).pop();
-                });
+                    await uploadFile(context, widget.file).whenComplete(() {});
                 if (request) {
-                  setState(() {
-                    Fluttertoast.showToast(
-                        msg: "Upload Success!!!!!",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 10,
-                        backgroundColor: Colors.white54,
-                        textColor: Colors.white,
-                        fontSize: 20.0);
-                  });
+                  await Fluttertoast.showToast(
+                      msg: "Upload Success!!!!!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 2,
+                      backgroundColor: Colors.white54,
+                      textColor: Colors.white,
+                      fontSize: 20.0);
                 }
               },
               icon: const Icon(
