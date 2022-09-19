@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'camera_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+  // SystemChrome.setEnabledSystemUIMode(
+  //     SystemUiMode.manual, overlays: SystemUiOverlay.values);
   runApp(const MyApp());
 }
 
@@ -34,7 +34,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool ActiveConnection = false;
 
   Future CheckUserConnection() async {
@@ -69,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
       });
     }
   }
+
 
   @override
   void initState() {
@@ -131,7 +132,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
         ),
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => const CameraPage()));
+              context,
+              MaterialPageRoute(builder: (context) => const CameraPage()));
         },
       ),
     );
