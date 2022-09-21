@@ -70,25 +70,55 @@ class _VideoPageState extends State<VideoPage> {
       ),
       // Use a FutureBuilder to display a loading spinner while waiting for the
       // VideoPlayerController to finish initializing.
-      body: FutureBuilder(
-        future: _initVideoPlayer,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the VideoPlayerController has finished initialization, use
-            // the data it provides to limit the aspect ratio of the video.
-            return AspectRatio(
-              aspectRatio: _videoPlayerController.value.aspectRatio,
-              // Use the VideoPlayer widget to display the video.
-              child: VideoPlayer(_videoPlayerController),
-            );
-          } else {
-            // If the VideoPlayerController is still initializing, show a
-            // loading spinner.
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+      body: Stack(
+        children: [
+          FutureBuilder(
+            future: _initVideoPlayer,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                // If the VideoPlayerController has finished initialization, use
+                // the data it provides to limit the aspect ratio of the video.
+                return AspectRatio(
+                  aspectRatio: _videoPlayerController.value.aspectRatio,
+                  // Use the VideoPlayer widget to display the video.
+                  child: VideoPlayer(_videoPlayerController),
+                );
+              } else {
+                // If the VideoPlayerController is still initializing, show a
+                // loading spinner.
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
+          Positioned(
+              bottom: 0,
+              child: SizedBox(
+                height: 10,
+                width: MediaQuery.of(context).size.width,
+                child: VideoProgressIndicator(
+                  _videoPlayerController,
+                  allowScrubbing: true,
+                  colors: const VideoProgressColors(
+                      bufferedColor: Colors.grey, playedColor: Colors.red),
+                ),
+              )),
+          Positioned(
+            bottom: 6,
+            child: Container(
+                color: Colors.white,
+                child: ValueListenableBuilder(
+                  valueListenable: _videoPlayerController,
+                  builder: (context, VideoPlayerValue value, child) {
+                    //Do Something with the value.
+                    return Text(
+                        style: TextStyle(fontSize: 20),
+                        "${value.position.inHours.toString().padLeft(2, "0")}:${value.position.inMinutes.toString().padLeft(2, "0")}:${value.position.inSeconds.toString().padLeft(2, "0")}");
+                  },
+                )),
+          )
+        ],
       ),
 
       floatingActionButton: FloatingActionButton(

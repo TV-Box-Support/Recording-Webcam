@@ -34,6 +34,9 @@ dependencies:
   camera: ^0.10.0+1
   video_player: ^2.4.7
   fluttertoast: ^8.0.9
+  stop_watch_timer: ^2.0.0
+  permission_handler: ^8.3.0
+  path_provider: ^2.0.5
 
 
   # The following adds the Cupertino Icons font to your application.

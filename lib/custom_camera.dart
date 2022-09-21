@@ -1,7 +1,7 @@
-import 'dart:math';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CustomCamera extends StatefulWidget {
   // final List<CameraDescription>? cameras;
@@ -24,13 +24,18 @@ class CustomCamera extends StatefulWidget {
   _CustomCameraState createState() => _CustomCameraState();
 }
 
-class _CustomCameraState extends State<CustomCamera> {
+class _CustomCameraState extends State<CustomCamera>
+    with WidgetInspectorService {
   List<CameraDescription>? cameras;
 
   CameraController? controller;
 
+  final StopWatchTimer _stopWatchTimer = StopWatchTimer();
+
   @override
   void initState() {
+    // Hide the status bar in Android
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     super.initState();
     initCamera().then((_) {
       setCamera(0);
@@ -57,9 +62,6 @@ class _CustomCameraState extends State<CustomCamera> {
     controller?.dispose();
     super.dispose();
   }
-
-  bool _isTouchOn = false;
-  bool _isFrontCamera = false;
 
   ///Switch
   bool _cameraView = true;
@@ -153,19 +155,27 @@ class _CustomCameraState extends State<CustomCamera> {
             color: Colors.black,
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
-            // padding: const EdgeInsets.all(10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(
-                  onPressed: () {
-                    captureImage();
-                  },
-                  icon: Icon(
-                    Icons.camera,
-                    color: widget.iconColor,
-                    size: 50,
-                  ),
+                Stack(
+                  children: [
+                    const Icon(
+                      Icons.circle,
+                      color: Colors.white38,
+                      size: 60,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        captureImage();
+                      },
+                      icon: const Icon(
+                        Icons.circle,
+                        color: Colors.white,
+                        size: 44,
+                      ),
+                    ),
+                  ],
                 ),
                 IconButton(
                   onPressed: () {
@@ -173,10 +183,10 @@ class _CustomCameraState extends State<CustomCamera> {
                       _cameraView = false;
                     });
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.videocam,
-                    color: widget.iconColor,
-                    size: 60,
+                    color: Colors.white,
+                    size: 44,
                   ),
                 ),
               ],
@@ -216,25 +226,53 @@ class _CustomCameraState extends State<CustomCamera> {
             height: 90,
             child: Container(
               color: Colors.black,
-              padding: const EdgeInsets.only(top: 35),
+              padding: const EdgeInsets.all(20),
               width: MediaQuery.of(context).size.width,
               height: 90,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ///Front Camera toggle
                   cameraSwitcherWidget(),
                   Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        _isRecording == false ? 'Video' : 'Recording',
-                        style: TextStyle(
-                            color: _isRecording == false
-                                ? widget.iconColor
-                                : Colors.red,
-                            fontSize: 22),
-                      ),
-                    ),
+                    child: _isRecording == false
+                        ? const Text(
+                            'Video',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                        : Container(
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.circle,
+                                  color: Colors.red,
+                                  size: 15,
+                                ),
+                                StreamBuilder<int>(
+                                    stream: _stopWatchTimer.rawTime,
+                                    initialData: _stopWatchTimer.rawTime.value,
+                                    builder: (context, snapshot) {
+                                      final value = snapshot.data;
+                                      final displayTime =
+                                          StopWatchTimer.getDisplayTime(value!,
+                                              hours: false, milliSecond: false);
+                                      return Text(
+                                        displayTime,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      );
+                                    }),
+                              ],
+                            ),
+                          ),
                   ),
 
                   ///Flash toggle
@@ -268,60 +306,76 @@ class _CustomCameraState extends State<CustomCamera> {
                     size: 35,
                   ),
                 ),
-                const SizedBox(
-                  width: 0.1,
-                ),
-                IconButton(
-                  onPressed: () {
-                    //Start and stop video
-                    if (_isRecording == false) {
-                      ///Start
-                      controller!.startVideoRecording();
+                Stack(
+                  children: [
+                    const Icon(
+                      Icons.circle,
+                      color: Colors.white,
+                      size: 60,
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        //Start and stop video
+                        if (_isRecording == false) {
+                          ///Start
+                          await controller!.startVideoRecording();
 
-                      _isRecording = true;
-                    } else {
-                      ///Stop video recording
-                      controller!.stopVideoRecording().then((value) {
-                        Navigator.pop(context);
-                        widget.onVideoRecorded!(value);
-                      });
-                      _isRecording = false;
-                    }
-                    setState(() {});
-                  },
-                  icon: Icon(
-                    _isRecording == false
-                        ? Icons.panorama_fish_eye
-                        : Icons.circle_rounded,
-                    color: widget.iconColor,
-                    size: 50,
-                  ),
+                          _isRecording = true;
+                          _stopWatchTimer.onStartTimer();
+                        } else {
+                          ///Stop video recording
+                          controller!.stopVideoRecording().then((value) {
+                            Navigator.pop(context);
+                            widget.onVideoRecorded!(value);
+                          });
+                          _isRecording = false;
+                          _stopWatchTimer.onResetTimer();
+                        }
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        _isRecording == false
+                            ? Icons.circle
+                            : Icons.stop_circle,
+                        color: Colors.red,
+                        size: 44,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  width: 15,
-                ),
-                IconButton(
-                  onPressed: () {
-                    //pause and resume video
-                    if (_isRecording == true) {
-                      //pause
-                      if (_isPaused == true) {
-                        ///resume
-                        controller!.resumeVideoRecording();
-                        _isPaused = false;
-                      } else {
-                        ///resume
-                        controller!.pauseVideoRecording();
-                        _isPaused = true;
-                      }
-                    }
-                    setState(() {});
-                  },
-                  icon: Icon(
-                    _isPaused == false ? Icons.pause_circle : Icons.play_circle,
-                    color: widget.iconColor,
-                    size: 35,
-                  ),
+                Stack(
+                  children: [
+                    const Icon(
+                      Icons.circle,
+                      color: Colors.black38,
+                      size: 60,
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        //pause and resume video
+                        if (_isRecording == true) {
+                          //pause
+                          if (_isPaused == true) {
+                            ///resume
+                            await controller!.resumeVideoRecording();
+                            _stopWatchTimer.onStartTimer();
+                            _isPaused = false;
+                          } else {
+                            ///resume
+                            controller!.pauseVideoRecording();
+                            _isPaused = true;
+                            _stopWatchTimer.onStopTimer();
+                          }
+                        }
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        _isPaused == false ? Icons.pause : Icons.play_arrow,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -330,6 +384,8 @@ class _CustomCameraState extends State<CustomCamera> {
       ],
     );
   }
+
+  bool _isTouchOn = false;
 
   Widget flashToggleWidget() {
     return IconButton(
@@ -348,6 +404,8 @@ class _CustomCameraState extends State<CustomCamera> {
     );
   }
 
+  bool _isFrontCamera = false;
+
   Widget cameraSwitcherWidget() {
     return IconButton(
       onPressed: () {
@@ -360,8 +418,11 @@ class _CustomCameraState extends State<CustomCamera> {
         }
         setState(() {});
       },
-      icon:
-          Icon(Icons.change_circle_outlined, color: widget.iconColor, size: 30),
+      icon: Icon(
+        _isFrontCamera ? Icons.camera_front : Icons.camera_rear,
+        color: Colors.white,
+        size: 30,
+      ),
     );
   }
 }
