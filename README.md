@@ -1,6 +1,6 @@
 # recording_app
 
-A new Flutter project.
+The application can run on android tv, phone
 
 ## Getting Started
 

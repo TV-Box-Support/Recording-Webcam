@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:video_player/video_player.dart';
 
-import 'camera_page.dart';
 
 class VideoPage extends StatefulWidget {
   final String filePath;
@@ -106,20 +105,41 @@ class _VideoPageState extends State<VideoPage> {
                         size: 35,
                       ),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const CameraPage()));
+                        Navigator.pop(context);
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => const CameraPage()));
                       },
                     ),
-                    const Text(
-                      'Preview',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+
+                    Expanded(
+                        child: Container(
+                          alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.circle,
+                                    color: Colors.red,
+                                    size: 15,
+                                  ),
+                                  ValueListenableBuilder(
+                                      valueListenable: _videoPlayerController,
+                                      builder: (context, VideoPlayerValue value, child) {
+                                        //Do Something with the value.
+                                        return Text(
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white),
+                                            "${value.position.inMinutes.toString().padLeft(2, "0")}:${value.position.inSeconds.toString().padLeft(2, "0")} / ${_videoPlayerController.value.duration.inMinutes.toString().padLeft(2, "0")}:${_videoPlayerController.value.duration.inSeconds.toString().padLeft(2, "0")}");
+                                      },
+                                    ),
+                                ],
+                              ),
+                            )),
+
                     IconButton(
                         onPressed: () async {
                           var request = await uploadFile(context, widget.file)
@@ -127,6 +147,16 @@ class _VideoPageState extends State<VideoPage> {
                           if (request) {
                             await Fluttertoast.showToast(
                                 msg: "Upload Success!!!!!",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 2,
+                                backgroundColor: Colors.white54,
+                                textColor: Colors.white,
+                                fontSize: 20.0);
+                          } else {
+                            await Fluttertoast.showToast(
+                                msg:
+                                    "Something wrong, you should check connect internet or Url ",
                                 toastLength: Toast.LENGTH_SHORT,
                                 gravity: ToastGravity.BOTTOM,
                                 timeInSecForIosWeb: 2,

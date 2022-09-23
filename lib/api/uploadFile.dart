@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -34,8 +35,7 @@ Future<bool> uploadFile(BuildContext context, File file) async {
           ),
         );
       });
-  var request = http.MultipartRequest(
-      'POST', Uri.parse('http://192.168.1.40:5000/uploadFile'));
+  var request = http.MultipartRequest('POST', Uri.parse('http://192.168.88.156:5000/uploadFile'));
   request.files.add(await http.MultipartFile.fromPath('file', file.path));
   var response = await request.send();
 
@@ -47,3 +47,4 @@ Future<bool> uploadFile(BuildContext context, File file) async {
     return false;
   }
 }
+

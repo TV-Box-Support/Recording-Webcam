@@ -15,12 +15,11 @@ class CameraPage extends StatefulWidget {
   CameraPageState createState() => CameraPageState();
 }
 
-class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
-
+class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   //rotate BuilderFuture
   int quarterTurns = 0;
 
-  Future<void> CheckUserConnection() async {
+  Future<void> checkUserConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -32,8 +31,7 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
               timeInSecForIosWeb: 2,
               backgroundColor: Colors.white54,
               textColor: Colors.white,
-              fontSize: 16.0
-          );
+              fontSize: 16.0);
         });
       }
     } on SocketException catch (_) {
@@ -45,15 +43,14 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
             timeInSecForIosWeb: 2,
             backgroundColor: Colors.white54,
             textColor: Colors.white,
-            fontSize: 16.0
-        );
+            fontSize: 16.0);
       });
     }
   }
 
   @override
   void initState() {
-    CheckUserConnection();
+    checkUserConnection();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -67,14 +64,16 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
       return;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).size.width > MediaQuery.of(context).size.height ) {
+    if (MediaQuery.of(context).size.width >
+        MediaQuery.of(context).size.height) {
       quarterTurns = 1;
     }
     return CustomCamera(
@@ -101,26 +100,28 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
                                   builder: (context) => const CameraPage()));
                         },
                       ),
-                      // Builder(
-                      //   builder: (BuildContext context) {
-                      //     return IconButton(
-                      //       icon: const Icon(Icons.menu),
-                      //       onPressed: () { Scaffold.of(context).openDrawer(); },
-                      //       tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-                      //     );
-                      //   },
-                      // ),
                       title: const Text('Photo'),
                       centerTitle: true,
                       backgroundColor: Colors.black,
                       actions: [
                         IconButton(
-                            onPressed: () async {
+                            onPressed:
+                                //() => _uploadFile(file),
+                                () async {
                               var request = await uploadFile(context, file)
                                   .whenComplete(() {});
                               if (request) {
                                 Fluttertoast.showToast(
                                     msg: "Upload Success!!!!!",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 2,
+                                    backgroundColor: Colors.white54,
+                                    textColor: Colors.white,
+                                    fontSize: 20.0);
+                              } else {
+                                await Fluttertoast.showToast(
+                                    msg: "Something wrong, you should check connect internet or Url ",
                                     toastLength: Toast.LENGTH_SHORT,
                                     gravity: ToastGravity.BOTTOM,
                                     timeInSecForIosWeb: 2,
@@ -137,7 +138,7 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
                       ],
                     ),
                     body: RotatedBox(
-                    quarterTurns: quarterTurns,
+                      quarterTurns: quarterTurns,
                       child: PhotoView(
                         imageProvider: FileImage(file),
                       ),
@@ -155,7 +156,8 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver{
           // );
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => VideoPage(filePath: path, file: file)));
+              MaterialPageRoute(
+                  builder: (context) => VideoPage(filePath: path, file: file)));
         }
       },
     );
