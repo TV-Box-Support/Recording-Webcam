@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,6 +53,7 @@ class _CustomCameraState extends State<CustomCamera>
 
   Future initCamera() async {
     cameras = await availableCameras();
+    log('initCamera: $cameras');
     setState(() {});
   }
 
@@ -135,7 +136,13 @@ class _CustomCameraState extends State<CustomCamera>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                cameraSwitcherWidget(),
+                IconButton(
+                    onPressed: () => SystemNavigator.pop(),
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                      size: 30,
+                    )),
                 const Text(
                   "Capturing...",
                   style: TextStyle(color: Colors.white, fontSize: 22),
@@ -158,7 +165,18 @@ class _CustomCameraState extends State<CustomCamera>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                cameraSwitcherWidget(),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _cameraView = false;
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.videocam,
+                    color: Colors.white,
+                    size: 35,
+                  ),
+                ),
                 Stack(
                   children: [
                     const Icon(
@@ -178,22 +196,40 @@ class _CustomCameraState extends State<CustomCamera>
                     ),
                   ],
                 ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _cameraView = false;
-                    });
-                  },
-                  icon: const Icon(
-                    Icons.videocam,
-                    color: Colors.white,
-                    size: 44,
-                  ),
-                ),
+                cameraSwitcherWidget(),
               ],
             ),
           ),
-        )
+        ),
+
+        ///Side Controls
+        Positioned(
+          right: 0,
+          top: 90,
+          child: DropdownButton<ResolutionPreset>(
+            dropdownColor: Colors.black87,
+            underline: Container(),
+            value: currentResolutionPreset,
+            items: [
+              for (ResolutionPreset preset in resolutionPresets)
+                DropdownMenuItem(
+                  value: preset,
+                  child: Text(
+                    preset.toString().split('.')[1].toUpperCase(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                )
+            ],
+            onChanged: (value) {
+              setState(() {
+                currentResolutionPreset = value!;
+                controller =
+                    CameraController(cameras![0], currentResolutionPreset);
+              });
+              setCamera(0);
+            },
+          ),
+        ),
       ],
     );
   }
@@ -206,6 +242,8 @@ class _CustomCameraState extends State<CustomCamera>
     return Stack(
       key: const ValueKey(1),
       children: [
+
+        ///Camera Preview
         Positioned(
           top: 90,
           bottom: 90,
@@ -221,7 +259,7 @@ class _CustomCameraState extends State<CustomCamera>
           ),
         ),
 
-        ///top controlls
+        ///top controls
         Positioned(
             top: 0,
             height: 90,
@@ -233,12 +271,14 @@ class _CustomCameraState extends State<CustomCamera>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ///Front Camera toggle
-                  const Icon(
-                    Icons.line_weight,
-                    color: Colors.white,
-                    size: 44,
-                  ),
+                  ///Back
+                  IconButton(
+                      onPressed: () => SystemNavigator.pop(),
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                        size: 30,
+                      )),
                   Expanded(
                     child: _isRecording == false
                         ? const Text(
@@ -279,7 +319,6 @@ class _CustomCameraState extends State<CustomCamera>
                             ),
                           ),
                   ),
-
                   ///Flash toggle
                   flashToggleWidget()
                 ],
@@ -298,7 +337,44 @@ class _CustomCameraState extends State<CustomCamera>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
+                _isRecording
+                    ? Stack(
+                  children: [
+                    const Icon(
+                      Icons.circle,
+                      color: Colors.black38,
+                      size: 60,
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        //pause and resume video
+                        if (_isRecording == true) {
+                          //pause
+                          if (_isPaused == true) {
+                            ///resume
+                            await controller!.resumeVideoRecording();
+                            _stopWatchTimer.onStartTimer();
+                            _isPaused = false;
+                          } else {
+                            ///resume
+                            controller!.pauseVideoRecording();
+                            _isPaused = true;
+                            _stopWatchTimer.onStopTimer();
+                          }
+                        }
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        _isPaused == false
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    ),
+                  ],
+                )
+                    : IconButton(
                   onPressed: () {
                     setState(() {
                       ///Show camera view
@@ -348,48 +424,13 @@ class _CustomCameraState extends State<CustomCamera>
                     ),
                   ],
                 ),
-                _isRecording
-                    ? Stack(
-                        children: [
-                          const Icon(
-                            Icons.circle,
-                            color: Colors.black38,
-                            size: 60,
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              //pause and resume video
-                              if (_isRecording == true) {
-                                //pause
-                                if (_isPaused == true) {
-                                  ///resume
-                                  await controller!.resumeVideoRecording();
-                                  _stopWatchTimer.onStartTimer();
-                                  _isPaused = false;
-                                } else {
-                                  ///resume
-                                  controller!.pauseVideoRecording();
-                                  _isPaused = true;
-                                  _stopWatchTimer.onStopTimer();
-                                }
-                              }
-                              setState(() {});
-                            },
-                            icon: Icon(
-                              _isPaused == false
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
-                        ],
-                      )
-                    : cameraSwitcherWidget(),
+                cameraSwitcherWidget(),
               ],
             ),
           ),
         ),
+
+        ///Side Controls
         Positioned(
           right: 0,
           top: 90,
