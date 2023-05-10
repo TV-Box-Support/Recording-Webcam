@@ -1,16 +1,6 @@
-# recording_app
+# Recording App - Camera App for android TV, Android Phone
+##### Technical internship project at VNPT Technology company by student Nguyen Thanh Chung - School of Electrical and Electronic Engineering of Hanoi University of Science and Technology.
+contact for work, mail: chunhthanhde.dev@gmail.com
 
-The application can run on android tv, phone
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
