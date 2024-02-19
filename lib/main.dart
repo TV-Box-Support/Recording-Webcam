@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import 'camera_page.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
@@ -17,6 +16,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        canvasColor: Colors.black87,
+        highlightColor: Colors.grey,
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,

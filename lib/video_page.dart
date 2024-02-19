@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera_app/api/uploadFile.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:video_player/video_player.dart';
-
 
 class VideoPage extends StatefulWidget {
   final String filePath;
@@ -43,8 +43,7 @@ class _VideoPageState extends State<VideoPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).size.width >
-        MediaQuery.of(context).size.height) {
+    if (MediaQuery.of(context).size.width > MediaQuery.of(context).size.height) {
       quarterTurns = 1;
     }
     return Scaffold(
@@ -98,65 +97,62 @@ class _VideoPageState extends State<VideoPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ///Front Camera toggle
-                    IconButton(
-                      icon: const Icon(
-                        Icons.camera_alt_outlined,
-                        color: Colors.white,
-                        size: 35,
+                    SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: IconButton(
+                        focusColor: Colors.grey,
+                        icon: const Icon(
+                          Icons.camera_alt_outlined,
+                          color: Colors.white,
+                          size: 35,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => const CameraPage()));
+                        },
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => const CameraPage()));
-                      },
                     ),
 
                     Expanded(
-                        child: Container(
-                          alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 15,
-                                  ),
-                                  ValueListenableBuilder(
-                                      valueListenable: _videoPlayerController,
-                                      builder: (context, VideoPlayerValue value, child) {
-                                        //Do Something with the value.
-                                        return Text(
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                            "${value.position.inMinutes.toString().padLeft(2, "0")}:${value.position.inSeconds.toString().padLeft(2, "0")} / ${_videoPlayerController.value.duration.inMinutes.toString().padLeft(2, "0")}:${_videoPlayerController.value.duration.inSeconds.toString().padLeft(2, "0")}");
-                                      },
-                                    ),
-                                ],
-                              ),
-                            )),
-
-                    IconButton(
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.circle,
+                              color: Colors.red,
+                              size: 15,
+                            ),
+                            ValueListenableBuilder(
+                              valueListenable: _videoPlayerController,
+                              builder: (context, VideoPlayerValue value, child) {
+                                //Do Something with the value.
+                                return Text(
+                                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                                    "${value.position.inMinutes.toString().padLeft(2, "0")}:${value.position.inSeconds.toString().padLeft(2, "0")} / ${_videoPlayerController.value.duration.inMinutes.toString().padLeft(2, "0")}:${_videoPlayerController.value.duration.inSeconds.toString().padLeft(2, "0")}");
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: IconButton(
+                        focusColor: Colors.grey,
                         onPressed: () async {
-                          var request = await uploadFile(context, widget.file)
-                              .whenComplete(() {});
+                          var request = await uploadFile(context, widget.file).whenComplete(() {});
                           if (request) {
-                            await Fluttertoast.showToast(
-                                msg: "Upload Success!!!!!",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 2,
-                                backgroundColor: Colors.white54,
-                                textColor: Colors.white,
-                                fontSize: 20.0);
+                            await Fluttertoast.showToast(msg: "Upload Success!!!!!", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 2, backgroundColor: Colors.white54, textColor: Colors.white, fontSize: 20.0);
                           } else {
                             await Fluttertoast.showToast(
-                                msg:
-                                    "Something wrong, you should check connect internet or Url ",
+                                msg: "Something wrong, you should check connect internet or Url ",
                                 toastLength: Toast.LENGTH_SHORT,
                                 gravity: ToastGravity.BOTTOM,
                                 timeInSecForIosWeb: 2,
@@ -169,7 +165,9 @@ class _VideoPageState extends State<VideoPage> {
                           Icons.cloud_upload,
                           color: Colors.white,
                           size: 35,
-                        )),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               )),
@@ -190,35 +188,36 @@ class _VideoPageState extends State<VideoPage> {
                     child: VideoProgressIndicator(
                       _videoPlayerController,
                       allowScrubbing: true,
-                      colors: const VideoProgressColors(
-                          bufferedColor: Colors.grey,
-                          playedColor: Colors.white),
+                      colors: const VideoProgressColors(bufferedColor: Colors.grey, playedColor: Colors.white),
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          // Wrap the play or pause in a call to `setState`. This ensures the
-                          // correct icon is shown.
-                          setState(() {
-                            // If the video is playing, pause it.
-                            if (_videoPlayerController.value.isPlaying) {
-                              _videoPlayerController.pause();
-                            } else {
-                              // If the video is paused, play it.
-                              _videoPlayerController.play();
-                            }
-                          });
-                        },
-                        // Display the correct icon depending on the state of the player.
-                        icon: Icon(
-                          _videoPlayerController.value.isPlaying
-                              ? Icons.pause
-                              : Icons.play_arrow,
-                          color: Colors.white,
-                          size: 35,
+                      SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: IconButton(
+                          focusColor: Colors.grey,
+                          onPressed: () {
+                            // Wrap the play or pause in a call to `setState`. This ensures the
+                            // correct icon is shown.
+                            setState(() {
+                              // If the video is playing, pause it.
+                              if (_videoPlayerController.value.isPlaying) {
+                                _videoPlayerController.pause();
+                              } else {
+                                // If the video is paused, play it.
+                                _videoPlayerController.play();
+                              }
+                            });
+                          },
+                          // Display the correct icon depending on the state of the player.
+                          icon: Icon(
+                            _videoPlayerController.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                            color: Colors.white,
+                            size: 35,
+                          ),
                         ),
                       ),
                     ],
