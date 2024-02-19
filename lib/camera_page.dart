@@ -25,25 +25,27 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         setState(() {
           Fluttertoast.showToast(
-              msg: "wifi đã kết nối",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 2,
-              backgroundColor: Colors.white54,
-              textColor: Colors.white,
-              fontSize: 16.0);
-        });
-      }
-    } on SocketException catch (_) {
-      setState(() {
-        Fluttertoast.showToast(
-            msg: "Hãy kết nối wifi để có thể upload lên server",
+            msg: "wifi đã kết nối",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 2,
             backgroundColor: Colors.white54,
             textColor: Colors.white,
-            fontSize: 16.0);
+            fontSize: 16.0,
+          );
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        Fluttertoast.showToast(
+          msg: "Hãy kết nối wifi để có thể upload lên server",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.white54,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       });
     }
   }
@@ -64,16 +66,14 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
       return;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).size.width >
-        MediaQuery.of(context).size.height) {
+    if (MediaQuery.of(context).size.width > MediaQuery.of(context).size.height) {
       quarterTurns = 1;
     }
     return CustomCamera(
@@ -95,9 +95,9 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                         ),
                         onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CameraPage()));
+                            context,
+                            MaterialPageRoute(builder: (context) => const CameraPage()),
+                          );
                         },
                       ),
                       title: const Text('Photo'),
@@ -108,17 +108,17 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                             onPressed:
                                 //() => _uploadFile(file),
                                 () async {
-                              var request = await uploadFile(context, file)
-                                  .whenComplete(() {});
+                              var request = await uploadFile(context, file).whenComplete(() {});
                               if (request) {
                                 Fluttertoast.showToast(
-                                    msg: "Upload Success!!!!!",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 2,
-                                    backgroundColor: Colors.white54,
-                                    textColor: Colors.white,
-                                    fontSize: 20.0);
+                                  msg: "Upload Success!!!!!",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 2,
+                                  backgroundColor: Colors.white54,
+                                  textColor: Colors.white,
+                                  fontSize: 20.0,
+                                );
                               } else {
                                 await Fluttertoast.showToast(
                                     msg: "Something wrong, you should check connect internet or Url ",
@@ -150,14 +150,10 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         File file = File(value.path);
         final path = value.path;
         if (path.contains('.mp4')) {
-          // final route = MaterialPageRoute(
-          //   fullscreenDialog: false,
-          //   builder: (_) => VideoPage(filePath: path, file: file),
-          // );
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => VideoPage(filePath: path, file: file)));
+            context,
+            MaterialPageRoute(builder: (context) => VideoPage(filePath: path, file: file)),
+          );
         }
       },
     );

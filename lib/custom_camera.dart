@@ -1,33 +1,32 @@
 import 'dart:async';
 import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CustomCamera extends StatefulWidget {
-  // final List<CameraDescription>? cameras;
   final Color? color;
   final Color? iconColor;
-  Function(XFile)? onImageCaptured;
-  Function(XFile)? onVideoRecorded;
+  final Function(XFile)? onImageCaptured;
+  final Function(XFile)? onVideoRecorded;
   final Duration? animationDuration;
 
-  CustomCamera(
-      {Key? key,
-      this.onImageCaptured,
-      this.animationDuration = const Duration(seconds: 1),
-      this.onVideoRecorded,
-      this.iconColor = Colors.white70,
-      required this.color})
-      : super(key: key);
+  const CustomCamera({
+    Key? key,
+    this.onImageCaptured,
+    this.animationDuration = const Duration(seconds: 1),
+    this.onVideoRecorded,
+    this.iconColor = Colors.white70,
+    required this.color,
+  }) : super(key: key);
 
   @override
   _CustomCameraState createState() => _CustomCameraState();
 }
 
-class _CustomCameraState extends State<CustomCamera>
-    with WidgetsBindingObserver {
+class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver {
   List<CameraDescription>? cameras;
 
   CameraController? controller;
@@ -46,19 +45,32 @@ class _CustomCameraState extends State<CustomCamera>
     // Hide the status bar in Android
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     super.initState();
-    initCamera().then((_) {
-      setCamera(0);
-    });
+    initCamera();
   }
 
   Future initCamera() async {
     cameras = await availableCameras();
     log('initCamera: $cameras');
-    setState(() {});
+    if (cameras!.isNotEmpty) {
+      setState(() {
+        setCamera(0);
+      });
+    }
   }
 
   void setCamera(int index) {
-    controller = CameraController(cameras![index], currentResolutionPreset);
+    try {
+      controller = CameraController(cameras![index], currentResolutionPreset);
+    } catch (e) {
+      try {
+        currentResolutionPreset = ResolutionPreset.medium;
+        controller = CameraController(cameras![index], currentResolutionPreset);
+      } catch (e) {
+        currentResolutionPreset = ResolutionPreset.low;
+        controller = CameraController(cameras![index], currentResolutionPreset);
+      }
+    }
+
     controller!.initialize().then((_) {
       if (!mounted) {
         return;
@@ -78,7 +90,7 @@ class _CustomCameraState extends State<CustomCamera>
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).size.width > MediaQuery.of(context).size.height ) {
+    if (MediaQuery.of(context).size.width > MediaQuery.of(context).size.height) {
       quarterTurns = 1;
     }
     if (controller == null || !controller!.value.isInitialized) {
@@ -124,7 +136,7 @@ class _CustomCameraState extends State<CustomCamera>
           ),
         ),
 
-        //appbar
+        /// appbar
         Positioned(
           top: 0,
           height: 90,
@@ -134,15 +146,22 @@ class _CustomCameraState extends State<CustomCamera>
             color: Colors.black,
             padding: const EdgeInsets.all(20),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: IconButton(
+                    focusColor: Colors.grey,
                     onPressed: () => SystemNavigator.pop(),
                     icon: const Icon(
-                      Icons.arrow_back_ios,
+                      Icons.arrow_back_ios_new_sharp,
                       color: Colors.white,
-                      size: 30,
-                    )),
+                      size: 35,
+                    ),
+                  ),
+                ),
                 const Text(
                   "Capturing...",
                   style: TextStyle(color: Colors.white, fontSize: 22),
@@ -165,16 +184,21 @@ class _CustomCameraState extends State<CustomCamera>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _cameraView = false;
-                    });
-                  },
-                  icon: const Icon(
-                    Icons.videocam,
-                    color: Colors.white,
-                    size: 35,
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: IconButton(
+                    focusColor: Colors.grey,
+                    onPressed: () {
+                      setState(() {
+                        _cameraView = false;
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.videocam,
+                      color: Colors.white,
+                      size: 35,
+                    ),
                   ),
                 ),
                 Stack(
@@ -207,7 +231,7 @@ class _CustomCameraState extends State<CustomCamera>
           right: 0,
           top: 90,
           child: DropdownButton<ResolutionPreset>(
-            dropdownColor: Colors.black87,
+            dropdownColor: Colors.black38,
             underline: Container(),
             value: currentResolutionPreset,
             items: [
@@ -223,8 +247,7 @@ class _CustomCameraState extends State<CustomCamera>
             onChanged: (value) {
               setState(() {
                 currentResolutionPreset = value!;
-                controller =
-                    CameraController(cameras![0], currentResolutionPreset);
+                controller = CameraController(cameras![0], currentResolutionPreset);
               });
               setCamera(0);
             },
@@ -242,7 +265,6 @@ class _CustomCameraState extends State<CustomCamera>
     return Stack(
       key: const ValueKey(1),
       children: [
-
         ///Camera Preview
         Positioned(
           top: 90,
@@ -272,13 +294,18 @@ class _CustomCameraState extends State<CustomCamera>
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ///Back
-                  IconButton(
-                      onPressed: () => SystemNavigator.pop(),
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                        size: 30,
-                      )),
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: IconButton(
+                        focusColor: Colors.grey,
+                        onPressed: () => SystemNavigator.pop(),
+                        icon: const Icon(
+                          Icons.arrow_back_ios_outlined,
+                          color: Colors.white,
+                          size: 30,
+                        )),
+                  ),
                   Expanded(
                     child: _isRecording == false
                         ? const Text(
@@ -304,21 +331,25 @@ class _CustomCameraState extends State<CustomCamera>
                                     initialData: _stopWatchTimer.rawTime.value,
                                     builder: (context, snapshot) {
                                       final value = snapshot.data;
-                                      final displayTime =
-                                          StopWatchTimer.getDisplayTime(value!,
-                                              hours: false, milliSecond: false);
+                                      final displayTime = StopWatchTimer.getDisplayTime(
+                                        value!,
+                                        hours: false,
+                                        milliSecond: false,
+                                      );
                                       return Text(
                                         displayTime,
                                         style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       );
                                     }),
                               ],
                             ),
                           ),
                   ),
+
                   ///Flash toggle
                   flashToggleWidget()
                 ],
@@ -339,54 +370,57 @@ class _CustomCameraState extends State<CustomCamera>
               children: [
                 _isRecording
                     ? Stack(
-                  children: [
-                    const Icon(
-                      Icons.circle,
-                      color: Colors.black38,
-                      size: 60,
-                    ),
-                    IconButton(
-                      onPressed: () async {
-                        //pause and resume video
-                        if (_isRecording == true) {
-                          //pause
-                          if (_isPaused == true) {
-                            ///resume
-                            await controller!.resumeVideoRecording();
-                            _stopWatchTimer.onStartTimer();
-                            _isPaused = false;
-                          } else {
-                            ///resume
-                            controller!.pauseVideoRecording();
-                            _isPaused = true;
-                            _stopWatchTimer.onStopTimer();
-                          }
-                        }
-                        setState(() {});
-                      },
-                      icon: Icon(
-                        _isPaused == false
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                        size: 35,
+                        children: [
+                          const Icon(
+                            Icons.circle,
+                            color: Colors.black38,
+                            size: 60,
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              //pause and resume video
+                              if (_isRecording == true) {
+                                //pause
+                                if (_isPaused == true) {
+                                  ///resume
+                                  await controller!.resumeVideoRecording();
+                                  _stopWatchTimer.onStartTimer();
+                                  _isPaused = false;
+                                } else {
+                                  ///resume
+                                  controller!.pauseVideoRecording();
+                                  _isPaused = true;
+                                  _stopWatchTimer.onStopTimer();
+                                }
+                              }
+                              setState(() {});
+                            },
+                            icon: Icon(
+                              _isPaused == false ? Icons.pause : Icons.play_arrow,
+                              color: Colors.white,
+                              size: 35,
+                            ),
+                          ),
+                        ],
+                      )
+                    : SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: IconButton(
+                          focusColor: Colors.grey,
+                          onPressed: () {
+                            setState(() {
+                              ///Show camera view
+                              _cameraView = true;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: widget.iconColor,
+                            size: 35,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                )
-                    : IconButton(
-                  onPressed: () {
-                    setState(() {
-                      ///Show camera view
-                      _cameraView = true;
-                    });
-                  },
-                  icon: Icon(
-                    Icons.camera_alt,
-                    color: widget.iconColor,
-                    size: 35,
-                  ),
-                ),
                 Stack(
                   children: [
                     const Icon(
@@ -415,9 +449,7 @@ class _CustomCameraState extends State<CustomCamera>
                         setState(() {});
                       },
                       icon: Icon(
-                        _isRecording == false
-                            ? Icons.circle
-                            : Icons.stop_circle,
+                        _isRecording == false ? Icons.circle : Icons.stop_circle,
                         color: Colors.red,
                         size: 44,
                       ),
@@ -435,7 +467,7 @@ class _CustomCameraState extends State<CustomCamera>
           right: 0,
           top: 90,
           child: DropdownButton<ResolutionPreset>(
-            dropdownColor: Colors.black87,
+            dropdownColor: Colors.black38,
             underline: Container(),
             value: currentResolutionPreset,
             items: [
@@ -451,8 +483,7 @@ class _CustomCameraState extends State<CustomCamera>
             onChanged: (value) {
               setState(() {
                 currentResolutionPreset = value!;
-                controller =
-                    CameraController(cameras![0], currentResolutionPreset);
+                controller = CameraController(cameras![0], currentResolutionPreset);
               });
               setCamera(0);
             },
@@ -465,42 +496,49 @@ class _CustomCameraState extends State<CustomCamera>
   bool _isTouchOn = false;
 
   Widget flashToggleWidget() {
-    return IconButton(
-      onPressed: () {
-        if (_isTouchOn == false) {
-          controller!.setFlashMode(FlashMode.torch);
-          _isTouchOn = true;
-        } else {
-          controller!.setFlashMode(FlashMode.off);
-          _isTouchOn = false;
-        }
-        setState(() {});
-      },
-      icon: Icon(_isTouchOn == false ? Icons.flash_on : Icons.flash_off,
-          color: widget.iconColor, size: 30),
-    );
+    return SizedBox(
+        width: 50,
+        height: 50,
+        child: IconButton(
+          focusColor: Colors.grey,
+          onPressed: () {
+            if (_isTouchOn == false) {
+              controller!.setFlashMode(FlashMode.torch);
+              _isTouchOn = true;
+            } else {
+              controller!.setFlashMode(FlashMode.off);
+              _isTouchOn = false;
+            }
+            setState(() {});
+          },
+          icon: Icon(_isTouchOn == false ? Icons.flash_on : Icons.flash_off, color: widget.iconColor, size: 30),
+        ));
   }
 
   bool _isFrontCamera = false;
 
   Widget cameraSwitcherWidget() {
-    return IconButton(
-      onPressed: () {
-        if (_isFrontCamera == true) {
-          setCamera(0);
-          _isFrontCamera = false;
-        } else {
-          setCamera(1);
-          _isFrontCamera = true;
-        }
-        setState(() {});
-      },
-      icon: Icon(
-        _isFrontCamera ? Icons.camera_front : Icons.camera_rear,
-        color: Colors.white,
-        size: 30,
+    return SizedBox(
+      width: 50,
+      height: 50,
+      child: IconButton(
+        focusColor: Colors.grey,
+        onPressed: () {
+          if (_isFrontCamera == true) {
+            setCamera(0);
+            _isFrontCamera = false;
+          } else {
+            setCamera(1);
+            _isFrontCamera = true;
+          }
+          setState(() {});
+        },
+        icon: Icon(
+          _isFrontCamera ? Icons.camera_front : Icons.camera_rear,
+          color: Colors.white,
+          size: 30,
+        ),
       ),
     );
   }
-
 }

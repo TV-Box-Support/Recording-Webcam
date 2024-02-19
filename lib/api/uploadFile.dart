@@ -6,18 +6,18 @@ import 'package:http/http.dart' as http;
 
 Future<bool> uploadFile(BuildContext context, File file) async {
   showDialog(
-      //  The user CANNOT close this dialog  by pressing outsite it
+      //  The user CANNOT close this dialog  by pressing outside it
       barrierDismissible: false,
       context: context,
       builder: (_) {
-        return Dialog(
+        return const Dialog(
           // The background color
           backgroundColor: Colors.black,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: EdgeInsets.symmetric(vertical: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 // The loading indicator
                 CircularProgressIndicator(
                   color: Colors.white,
