@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class CustomCamera extends StatefulWidget {
@@ -96,10 +97,16 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
     if (controller == null || !controller!.value.isInitialized) {
       return Container();
     }
-    return Scaffold(
-      body: AnimatedSwitcher(
-        duration: widget.animationDuration!,
-        child: _cameraView == true ? cameraView() : videoView(),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        SystemNavigator.pop();
+      },
+      child: Scaffold(
+        body: AnimatedSwitcher(
+          duration: widget.animationDuration!,
+          child: _cameraView == true ? cameraView() : videoView(),
+        ),
       ),
     );
   }
@@ -114,6 +121,8 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
   void setVideo() {
     controller!.startVideoRecording();
   }
+
+  bool capturing = false;
 
   ///Camera View Layout
   Widget cameraView() {
@@ -156,16 +165,21 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
                     focusColor: Colors.grey,
                     onPressed: () => SystemNavigator.pop(),
                     icon: const Icon(
-                      Icons.arrow_back_ios_new_sharp,
+                      Icons.arrow_back_ios_outlined,
                       color: Colors.white,
                       size: 35,
                     ),
                   ),
                 ),
-                const Text(
-                  "Capturing...",
-                  style: TextStyle(color: Colors.white, fontSize: 22),
-                ),
+                capturing
+                    ? const Text(
+                        "Capturing...",
+                        style: TextStyle(color: Colors.white, fontSize: 22),
+                      )
+                    : const Text(
+                        "Image",
+                        style: TextStyle(color: Colors.white, fontSize: 22),
+                      ),
                 flashToggleWidget(),
               ],
             ),
@@ -210,6 +224,9 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
                     ),
                     IconButton(
                       onPressed: () {
+                        setState(() {
+                          capturing = true;
+                        });
                         captureImage();
                       },
                       icon: const Icon(
@@ -369,39 +386,35 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _isRecording
-                    ? Stack(
-                        children: [
-                          const Icon(
-                            Icons.circle,
-                            color: Colors.black38,
-                            size: 60,
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              //pause and resume video
-                              if (_isRecording == true) {
-                                //pause
-                                if (_isPaused == true) {
-                                  ///resume
-                                  await controller!.resumeVideoRecording();
-                                  _stopWatchTimer.onStartTimer();
-                                  _isPaused = false;
-                                } else {
-                                  ///resume
-                                  controller!.pauseVideoRecording();
-                                  _isPaused = true;
-                                  _stopWatchTimer.onStopTimer();
-                                }
+                    ? SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: IconButton(
+                          focusColor: Colors.grey,
+                          onPressed: () async {
+                            //pause and resume video
+                            if (_isRecording == true) {
+                              //pause
+                              if (_isPaused == true) {
+                                ///resume
+                                await controller!.resumeVideoRecording();
+                                _stopWatchTimer.onStartTimer();
+                                _isPaused = false;
+                              } else {
+                                ///resume
+                                controller!.pauseVideoRecording();
+                                _isPaused = true;
+                                _stopWatchTimer.onStopTimer();
                               }
-                              setState(() {});
-                            },
-                            icon: Icon(
-                              _isPaused == false ? Icons.pause : Icons.play_arrow,
-                              color: Colors.white,
-                              size: 35,
-                            ),
+                            }
+                            setState(() {});
+                          },
+                          icon: Icon(
+                            _isPaused == false ? Icons.pause : Icons.play_arrow,
+                            color: Colors.white,
+                            size: 35,
                           ),
-                        ],
+                        ),
                       )
                     : SizedBox(
                         width: 50,
@@ -503,15 +516,31 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
           focusColor: Colors.grey,
           onPressed: () {
             if (_isTouchOn == false) {
-              controller!.setFlashMode(FlashMode.torch);
-              _isTouchOn = true;
+              try {
+                controller!.setFlashMode(FlashMode.torch);
+                _isTouchOn = true;
+              } catch (e) {
+                Fluttertoast.showToast(
+                  msg: "No Flash function",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 2,
+                  backgroundColor: Colors.black54,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
             } else {
               controller!.setFlashMode(FlashMode.off);
               _isTouchOn = false;
             }
             setState(() {});
           },
-          icon: Icon(_isTouchOn == false ? Icons.flash_on : Icons.flash_off, color: widget.iconColor, size: 30),
+          icon: Icon(
+            _isTouchOn == false ? Icons.flash_on : Icons.flash_off,
+            color: widget.iconColor,
+            size: 30,
+          ),
         ));
   }
 
@@ -519,26 +548,51 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
 
   Widget cameraSwitcherWidget() {
     return SizedBox(
-      width: 50,
-      height: 50,
-      child: IconButton(
-        focusColor: Colors.grey,
-        onPressed: () {
-          if (_isFrontCamera == true) {
-            setCamera(0);
-            _isFrontCamera = false;
-          } else {
-            setCamera(1);
-            _isFrontCamera = true;
-          }
-          setState(() {});
-        },
-        icon: Icon(
-          _isFrontCamera ? Icons.camera_front : Icons.camera_rear,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-    );
+        width: 50,
+        height: 50,
+        child: IconButton(
+          focusColor: Colors.grey,
+          onPressed: () async {
+            try {
+              cameras = await availableCameras();
+            } catch (e) {
+              Fluttertoast.showToast(
+                msg: "Camera not found",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 2,
+                backgroundColor: Colors.black54,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+              return;
+            }
+            if (cameras!.length == 2) {
+              if (_isFrontCamera == true) {
+                setCamera(0);
+                _isFrontCamera = false;
+              } else {
+                setCamera(1);
+                _isFrontCamera = true;
+              }
+            } else if (cameras!.length == 1) {
+              Fluttertoast.showToast(
+                msg: "There is only one camera",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 2,
+                backgroundColor: Colors.black54,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+            }
+            setState(() {});
+          },
+          icon: Icon(
+            _isFrontCamera ? Icons.camera_front : Icons.camera_rear,
+            color: Colors.white,
+            size: 30,
+          ),
+        ));
   }
 }
