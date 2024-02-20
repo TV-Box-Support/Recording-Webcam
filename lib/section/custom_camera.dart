@@ -167,7 +167,7 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
                     icon: const Icon(
                       Icons.arrow_back_ios_outlined,
                       color: Colors.white,
-                      size: 35,
+                      size: 30,
                     ),
                   ),
                 ),
