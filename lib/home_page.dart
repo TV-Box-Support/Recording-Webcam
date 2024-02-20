@@ -50,7 +50,7 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     return CustomCamera(
       color: Colors.white70,
       onImageCaptured: (value) async {
-         File file = File(value.path);
+        File file = File(value.path);
         final path = value.path;
         if (path.contains('.jpg')) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ImagePage(file: file)));

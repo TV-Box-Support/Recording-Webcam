@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:camera_app/controler/upload_file_server.dart';
@@ -16,7 +15,6 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
-
   //rotate BuilderFuture
   int quarterTurns = 0;
 
