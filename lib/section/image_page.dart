@@ -16,7 +16,6 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
-  late Future<void> _initImagePlayer;
 
   //rotate BuilderFuture
   int quarterTurns = 0;
