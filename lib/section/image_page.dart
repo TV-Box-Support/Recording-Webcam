@@ -36,7 +36,6 @@ class _ImagePageState extends State<ImagePage> {
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) {
-        print("chung PopScope");
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SplashScreen()));
       },
       child: Scaffold(

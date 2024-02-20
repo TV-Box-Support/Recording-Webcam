@@ -20,7 +20,6 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    print("chung initState");
     checkUserConnection();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
@@ -28,14 +27,12 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    print("chung dispose");
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print(" chung didChangeAppLifecycleState");
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
       return;

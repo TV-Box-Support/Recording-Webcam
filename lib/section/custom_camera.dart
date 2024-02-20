@@ -98,7 +98,7 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
       return Container();
     }
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvoked: (didPop) {
         SystemNavigator.pop();
       },
@@ -113,7 +113,7 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
 
   void captureImage() {
     controller!.takePicture().then((value) {
-      Navigator.pop(context);
+      // Navigator.pop(context);
       widget.onImageCaptured!(value);
     });
   }
@@ -453,7 +453,7 @@ class _CustomCameraState extends State<CustomCamera> with WidgetsBindingObserver
                         } else {
                           ///Stop video recording
                           controller!.stopVideoRecording().then((value) {
-                            Navigator.pop(context);
+                            // Navigator.pop(context);
                             widget.onVideoRecorded!(value);
                           });
                           _isRecording = false;
