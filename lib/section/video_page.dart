@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:camera_app/api/uploadFile.dart';
+import 'package:camera_app/controler/upload_file_server.dart';
+import 'package:camera_app/main.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPage extends StatefulWidget {
@@ -108,15 +108,10 @@ class _VideoPageState extends State<VideoPage> {
                           size: 35,
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => const CameraPage()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SplashScreen()));
                         },
                       ),
                     ),
-
                     Expanded(
                       child: Container(
                         alignment: Alignment.center,
@@ -144,29 +139,7 @@ class _VideoPageState extends State<VideoPage> {
                     SizedBox(
                       width: 50,
                       height: 50,
-                      child: IconButton(
-                        focusColor: Colors.grey,
-                        onPressed: () async {
-                          var request = await uploadFile(context, widget.file).whenComplete(() {});
-                          if (request) {
-                            await Fluttertoast.showToast(msg: "Upload Success!!!!!", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 2, backgroundColor: Colors.white54, textColor: Colors.white, fontSize: 20.0);
-                          } else {
-                            await Fluttertoast.showToast(
-                                msg: "Something wrong, you should check connect internet or Url ",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 2,
-                                backgroundColor: Colors.white54,
-                                textColor: Colors.white,
-                                fontSize: 20.0);
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.cloud_upload,
-                          color: Colors.white,
-                          size: 35,
-                        ),
-                      ),
+                      child: UpdateFile(file: widget.file),
                     ),
                   ],
                 ),
