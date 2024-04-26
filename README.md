@@ -1,14 +1,26 @@
-# Recording Webcam - Camera App for android TV, Android Phone
+# Recording Webcam - Camera App for Android TV, Android Phone
 
-##### Technical internship project at VNPT Technology company by student Nguyen Thanh Chung - School of Electrical and Electronic Engineering of Hanoi University of Science and Technology.
+Technical internship project at VNPT Technology company by student Nguyen Thanh Chung - School of Electrical and Electronic Engineering of Hanoi University of Science and Technology.
+
+Show some ❤️ and star ⭐ the repo if you liked it.
 
 ###### contact for work, mail: chunhthanhde.dev@gmail.com
 
 <img src="media/logo/ic_launcher_main.jpg" height="100px" />
 
+![GitHub stars](https://img.shields.io/github/stars/chunhthanhde/Recording-Webcam?style=social)
+![GitHub forks](https://img.shields.io/github/forks/chunhthanhde/Recording-Webcam?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/chunhthanhde/Recording-Webcam?style=social)
+
+<a href="https://www.linkedin.com/in/chunhthanhde/">
+<img src="https://img.shields.io/badge/Support-Recommend%2FEndorse%20me%20on%20Linkedin-blue?style=for-the-badge&logo=linkedin" alt="Support me on LinkedIn" />
+</a>
+
+<a href="https://www.buymeacoffee.com/chunhthanhde" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 ## About
 
-Recording - Camera app for capture or record video and upload file to server.
+Recording - Camera app for capturing or recording video and uploading files to the server.
 
 __Available Function__
 
